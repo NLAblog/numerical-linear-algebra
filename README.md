@@ -53,21 +53,20 @@ title:  "Name of article"
 `Save` your image in the images folder
 
 then in the beginning of the page add
-```markdown
-img1 : /images/ur-image.png 
-```
+
 
 **Floating image**
 ```markdown
+img1 : /images/ur-image.png
 <div style="float: right;"> <img src="{{page.img1 | relative_url}}" height="220" width="400"></div>
 ```
 
 
 **Centered Image**
+
+
 ```markdown
 img2 : /images/ur-2nd-image.jpg
-```
-```markdown
 <div style="float: right;"> <img src="{{page.img2 | relative_url}}" height="220" width="400"></div>
 ```
 
@@ -92,11 +91,30 @@ img2 : /images/ur-2nd-image.jpg
 
 {% endhighlight language %}
 
-### References for other Syntax 
+## Github 
+
+press `ctrl-c` to stop the server
+
+change the branch from `main` to `gh-pages`
+
+```bash
+git checkout gh-pages
+```
+
+then add, commit and push the changes to gh-pages
+
+ ```bash
+ git add .
+ git commit -m"Message"
+ git push origin gh-pages
+
+```
+
+#### References for other Syntax 
 https://kramdown.gettalong.org/quickref.html#block-attributes
 
-### Reference for Changing About/Details of home page
+#### Reference for Changing About/Details of home page
 https://www.youtube.com/watch?v=ZtEbGztktvc&list=PLLAZ4kZ9dFpOPV5C5Ay0pHaa0RJFhcmcB&index=5
 
-### Reference for changing default layout of Blog post
+#### Reference for changing default layout of Blog post
 https://www.youtube.com/watch?v=bDQsGdCWv4I&list=PLLAZ4kZ9dFpOPV5C5Ay0pHaa0RJFhcmcB&index=12
