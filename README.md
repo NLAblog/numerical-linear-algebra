@@ -92,11 +92,11 @@ img2 : /images/ur-2nd-image.jpg
 
 {% endhighlight language %}
 
-## References for other Syntax 
+### References for other Syntax 
 https://kramdown.gettalong.org/quickref.html#block-attributes
 
-## Reference for Changing About/Details of home page
+### Reference for Changing About/Details of home page
 https://www.youtube.com/watch?v=ZtEbGztktvc&list=PLLAZ4kZ9dFpOPV5C5Ay0pHaa0RJFhcmcB&index=5
 
-## Reference for changing default layout of Blog post
+### Reference for changing default layout of Blog post
 https://www.youtube.com/watch?v=bDQsGdCWv4I&list=PLLAZ4kZ9dFpOPV5C5Ay0pHaa0RJFhcmcB&index=12
