@@ -1,0 +1,73 @@
+I"�#<p>For this task we will be analysing the change in Lahore’s Air Quality Index (AQI) over the year 2021 and try to predict trends based on the data that we have. Here $y$ will represent the AQI of the day and $x$ will represent the days, with  $x$ = 1 corresponding to 01/01/2021 and $x$ = 274 corresponding to 30/09/2021.</p>
+
+<p>Least squares approximation is a method to estimate the true value of parameters given a measurements that have a lot of noise in them. The least squares solution will be a “best approximate solution” that minimizes sum of squared distances. For an $Ax = y$, with A being the model and x being the input given, we wish to find a model that minimizes the $\mathbb{L_2}$ square norm error.</p>
+
+\[\Vert{\mathbf{A}\hat{\mathbf{x}} - \mathbf{y}}\Vert_2^2\]
+
+<p>Our goal will be to apply least squares approximation for different models on the noisy data that we hare working with.</p>
+
+<p><strong>1. Importing Libaries</strong></p>
+
+<p>We will be using four Library’s in python <code class="language-plaintext highlighter-rouge">numpy</code>, <code class="language-plaintext highlighter-rouge">matplotlib</code>, <code class="language-plaintext highlighter-rouge">pandas</code> and <code class="language-plaintext highlighter-rouge">Sklearn</code>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span>
+</code></pre></div></div>
+
+<p><strong>2. Loading and Viewing Data</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">"lahore-aqi-data.csv"</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s">'date'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="s">'2021-01-01'</span><span class="p">)]</span>
+<span class="n">df</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="s">'date'</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s">' pm25'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div style="text-align: center;"> <img src="/numerical-linear-algebra/images/App-img1.png" height="220" width="400" /></div>
+
+<p><strong>3. Splitting the data and reshaping data</strong></p>
+
+<p>We will splitting our data into training and test set. Where 80% of the data will go to training and the rest of the 20% will go to test set. We will also be using <code class="language-plaintext highlighter-rouge">np.linspace</code> to transform our x values which are in the form of dates and unsuitable as input to days.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">274</span><span class="p">,</span><span class="mi">273</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">' pm25'</span><span class="p">].</span><span class="n">values</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>4. Least Squares with 3 different models</strong></p>
+
+<p>from sklearn.preprocessing import PolynomialFeatures</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">polymonial_regression</span><span class="p">(</span><span class="n">deg</span><span class="p">):</span>
+    <span class="n">poly_reg</span> <span class="o">=</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="n">deg</span><span class="p">)</span>
+    <span class="n">X_r</span> <span class="o">=</span> <span class="n">poly_reg</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">pl_reg</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+    <span class="n">pl_reg</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_r</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'green'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">pl_reg</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">poly_reg</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)),</span> <span class="n">color</span><span class="o">=</span><span class="s">'red'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">"Fitting polynomial of Degree {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">deg</span><span class="p">))</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Days'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'AQI'</span><span class="p">)</span>
+
+    <span class="k">return</span>
+
+
+<span class="n">polymonial_regression</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">polymonial_regression</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">polymonial_regression</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div style="text-align: center;"> <img src="/numerical-linear-algebra/images/App-img2.png" height="220" width="500" /></div>
+<div style="text-align: center;"> <img src="/numerical-linear-algebra/images/App-img3.png" height="220" width="500" /></div>
+<div style="text-align: center;"> <img src="/numerical-linear-algebra/images/App-img4.png" height="220" width="500" /></div>
+:ET

@@ -1,0 +1,8 @@
+I"�<p>For this task we will be analysing the change in Lahore’s Air Quality Index (AQI) over the year 2021 and try to predict trends based on the data that we have. Here $y$ will represent the AQI of the day and $x$ will represent the days, with  $x$ = 1 corresponding to 01/01/2021 and $x$ =274 corresponding to 30/09/2021.</p>
+
+<p>Least squares approximation is a method to estimate the true value of parameters given a measurements that have a lot of noise in them. The least squares solution will be a “best approximate solution” that minimizes sum of squared distances. For an $Ax = y$, with A being the model and x being the input given, we wish to find a model that minimizes the $\mathbb{l2}$ square norm error.</p>
+
+\[\Vert{\mathbf{A}\hat{\mathbf{x}} - \mathbf{y}}\Vert_2\]
+
+<p>Our goal will be to apply least squares approximation for different models on the noisy data that we hare working with.</p>
+:ET

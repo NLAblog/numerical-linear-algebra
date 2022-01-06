@@ -1,0 +1,60 @@
+I";<p>A norm is a <strong>function that</strong> assigns a real-valued length to
+each vector. In order to conform to a reasonable notion of length, a norm
+must satisfy the following three conditions. For all vectors $x$ and $y$ and for all
+scalars $c$  $\in$ $\mathbb{C}$,</p>
+
+<div style="float: right;"> <img src="/numerical-linear-algebra/images/norm-img.png" height="220" width="400" /></div>
+
+<h3 id="conditions">Conditions</h3>
+<ol>
+  <li>
+    <p>$\Vert{x}\Vert \ge 0$ and $\Vert{x}\Vert = 0$ only if $x = 0$</p>
+  </li>
+  <li>
+    <p>$\Vert{x+y}\Vert ≤ \Vert{x}\Vert + \Vert{y}\Vert$</p>
+  </li>
+  <li>
+    <p>$\Vert{cx}\Vert = c\Vert{x}\Vert$</p>
+  </li>
+</ol>
+
+<p><br /></p>
+<h3 id="matrix-norms-induced-by-vector-norms">Matrix Norms Induced by Vector Norms</h3>
+
+<ul>
+  <li>
+    <p>Action of A is determined by unit vectors</p>
+  </li>
+  <li>
+    <p>Matrix norm is stretch</p>
+  </li>
+</ul>
+
+<p>\(\Vert{A}\Vert_1\) = Maximum of 1-norm of column vectors of $A$</p>
+
+<p>\(\Vert{A}\Vert_2\) = Largest singular value</p>
+
+<p>$\Vert{A}\Vert_{\infty}$  = Maximum of 1-norm of column vectors of $A^{T}$</p>
+
+<div style="text-align: center;"> <img src="/numerical-linear-algebra/images/mat-norm-img.png" height="300" width="500" /> <figcaption> fig2 - Dashed line mark the vectors most amplified by A </figcaption>
+</div>
+
+<h3 id="code">Code</h3>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([[</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
+
+
+<span class="c1">#L1 norm
+</span><span class="n">one</span><span class="o">-</span><span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1">#L2 norm
+</span><span class="n">two</span><span class="o">-</span><span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="c1">#Infinity norm
+</span><span class="k">def</span> <span class="nf">inf_norm</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">row</span><span class="p">.</span><span class="nb">sum</span><span class="p">())</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">matrix</span><span class="p">)</span></code></pre></figure>
+
+:ET

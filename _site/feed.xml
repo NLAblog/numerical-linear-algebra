@@ -1,0 +1,621 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="http://localhost:4000/numerical-linear-algebra/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/numerical-linear-algebra/" rel="alternate" type="text/html" /><updated>2021-11-29T00:06:17+04:00</updated><id>http://localhost:4000/numerical-linear-algebra/feed.xml</id><title type="html">NLA blog</title><subtitle></subtitle><entry><title type="html">Least Squares Application</title><link href="http://localhost:4000/numerical-linear-algebra/2021/11/26/Application.html" rel="alternate" type="text/html" title="Least Squares Application" /><published>2021-11-26T00:00:00+04:00</published><updated>2021-11-26T00:00:00+04:00</updated><id>http://localhost:4000/numerical-linear-algebra/2021/11/26/Application</id><content type="html" xml:base="http://localhost:4000/numerical-linear-algebra/2021/11/26/Application.html">&lt;p&gt;For this task we will be analysing the change in Lahore’s Air Quality Index (AQI) over the year 2021 and try to predict trends based on the data that we have. Here $y$ will represent the AQI of the day and $x$ will represent the days, with  $x$ = 1 corresponding to 01/01/2021 and $x$ = 274 corresponding to 30/09/2021.&lt;/p&gt;
+
+&lt;p&gt;Least squares approximation is a method to estimate the true value of parameters given a measurements that have a lot of noise in them. The least squares solution will be a “best approximate solution” that minimizes sum of squared distances. For an $Ax = y$, with A being the model and x being the input given, we wish to find a model that minimizes the $\mathbb{L_2}$ square norm error.&lt;/p&gt;
+
+\[\Vert{\mathbf{A}\hat{\mathbf{x}} - \mathbf{y}}\Vert_2^2\]
+
+&lt;p&gt;Our goal will be to apply least squares approximation for different models on the noisy data that we hare working with.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;1. Importing Libaries&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;We will be using four Library’s in python &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;numpy&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;matplotlib&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pandas&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Sklearn&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;numpy&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;pandas&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pd&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;matplotlib.pyplot&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;2. Loading and Viewing Data&lt;/strong&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read_csv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;lahore-aqi-data.csv&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;date&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&apos;2021-01-01&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&apos;date&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&apos; pm25&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div style=&quot;text-align: center;&quot;&gt; &lt;img src=&quot;/numerical-linear-algebra/images/App-img1.png&quot; height=&quot;220&quot; width=&quot;400&quot; /&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;3. Splitting the data and reshaping data&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;We will splitting our data into training and test set. Where 80% of the data will go to training and the rest of the 20% will go to test set. We will also be using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;np.linspace&lt;/code&gt; to transform our x values which are in the form of dates and unsuitable as input to days.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;linspace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;274&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;273&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos; pm25&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reshape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reshape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sklearn.model_selection&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;train_test_split&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;X_train&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X_test&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y_train&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y_test&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;train_test_split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test_size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;random_state&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;4. Least Squares with 3 different models&lt;/strong&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sklearn.preprocessing&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PolynomialFeatures&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;polymonial_regression&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;poly_reg&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PolynomialFeatures&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;degree&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;X_r&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;poly_reg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fit_transform&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;pl_reg&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;LinearRegression&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;pl_reg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X_r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;scatter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;green&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pl_reg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;predict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;poly_reg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fit_transform&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;red&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Fitting polynomial of Degree {}&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xlabel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;Days&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ylabel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;AQI&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div style=&quot;float: right;&quot;&gt; &lt;img src=&quot;/numerical-linear-algebra/images/App-img3.png&quot; height=&quot;220&quot; width=&quot;350&quot; /&gt;&lt;/div&gt;
+&lt;div style=&quot;float: left;&quot;&gt; &lt;img src=&quot;/numerical-linear-algebra/images/App-img2.png&quot; height=&quot;220&quot; width=&quot;380&quot; /&gt;&lt;/div&gt;
+
+&lt;div style=&quot;text-align: center;&quot;&gt; &lt;img src=&quot;/numerical-linear-algebra/images/App-img4.png&quot; height=&quot;220&quot; width=&quot;500&quot; /&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;5. Prediction&lt;/strong&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;predict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;day&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;poly_reg&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PolynomialFeatures&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;degree&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;X_r&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;poly_reg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fit_transform&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;pl_reg&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;LinearRegression&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;pl_reg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X_r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pl_reg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;predict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;poly_reg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fit_transform&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;day&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]]))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;predict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;300&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;  
+&lt;span class=&quot;c1&quot;&gt;#output is array([[77.26266677]])
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;predict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;300&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;  
+&lt;span class=&quot;c1&quot;&gt;#output is array([[198.63029506]])
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;predict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;300&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;    
+&lt;span class=&quot;c1&quot;&gt;#output is array([[410.64869444]])
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We can see that higher degree polynomials cause &lt;em&gt;overfitting&lt;/em&gt;.This happens when the model we have built is more complex than the actual model. When we try and predict the AQI for the date 27th October 2021 which is the 300th day of the year. The actual value of the AQI was 192. From our linear model we obtained the result of 77 and from our poylnomial of degree 6 we obtained 410 AQI while from our model with degree 3 we got 198 which is closest to our actual value.&lt;/p&gt;</content><author><name></name></author><summary type="html">For this task we will be analysing the change in Lahore’s Air Quality Index (AQI) over the year 2021 and try to predict trends based on the data that we have. Here $y$ will represent the AQI of the day and $x$ will represent the days, with $x$ = 1 corresponding to 01/01/2021 and $x$ = 274 corresponding to 30/09/2021.</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="http://localhost:4000/numerical-linear-algebra/images/App-img1.png" /><media:content medium="image" url="http://localhost:4000/numerical-linear-algebra/images/App-img1.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Eigen Value Decomposition vs Singular Value Decomposition</title><link href="http://localhost:4000/numerical-linear-algebra/2021/11/25/evdvssvd.html" rel="alternate" type="text/html" title="Eigen Value Decomposition vs Singular Value Decomposition" /><published>2021-11-25T00:00:00+04:00</published><updated>2021-11-25T00:00:00+04:00</updated><id>http://localhost:4000/numerical-linear-algebra/2021/11/25/evdvssvd</id><content type="html" xml:base="http://localhost:4000/numerical-linear-algebra/2021/11/25/evdvssvd.html">&lt;p&gt;&lt;strong&gt;Differences&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Not every matrix has eigenvalue decomposition, but every matrix has singular value decomposition&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Eigenvalues may not always be real numbers, but singular values are always non-negative real numbers&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Eigenvectors are not always orthogonal to each other (orthogonal for symmetric matrices), but left (or right) singular vectors are orthogonal to each other&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;Similarities&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Singular values of A are square roots of eigenvalues of $AA^*$ and $A^∗A$, and their eigenvectors are left and right singular vectors, respectively&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Singular values of hermitian matrices are absolute values of eigenvalues, and eigenvectors are singular vectors (up to complex signs)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;This relationship can be used to compute singular values by hand&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;</content><author><name></name></author><summary type="html">Differences</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="http://localhost:4000/numerical-linear-algebra/images/SVD-img1.png" /><media:content medium="image" url="http://localhost:4000/numerical-linear-algebra/images/SVD-img1.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">EigenValue Decomposition</title><link href="http://localhost:4000/numerical-linear-algebra/2021/11/24/evd.html" rel="alternate" type="text/html" title="EigenValue Decomposition" /><published>2021-11-24T00:00:00+04:00</published><updated>2021-11-24T00:00:00+04:00</updated><id>http://localhost:4000/numerical-linear-algebra/2021/11/24/evd</id><content type="html" xml:base="http://localhost:4000/numerical-linear-algebra/2021/11/24/evd.html">&lt;h2 id=&quot;eigenvalue-and-eigenvectors&quot;&gt;Eigenvalue and Eigenvectors&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Eigenvalue problem of $m \times m$ matrix $\mathbf{A}$ is&lt;/li&gt;
+&lt;/ul&gt;
+
+\[\mathbf{A} \mathbf{x} = \lambda \mathbf{x}\]
+
+&lt;p&gt;with eigenvalues $\lambda$ and eigenvectors $\mathbf{x}$ (nonzero)&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;The set of all the eigenvalues of $\mathbf{A}$ is the spectrum of $\mathbf{A}$&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Eigenvalue are generally used where a matrix is to be compounded iteratively&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Eigenvalues are useful for algorithmic and physical reasons&lt;/p&gt;
+    &lt;ul&gt;
+      &lt;li&gt;Algorithmically, eigenvalue analysis can reduce a coupled system to a
+collection of scalar problems&lt;/li&gt;
+      &lt;li&gt;Physically, eigenvalue analysis can be used to study resonance of
+musical instruments and stability of physical systems&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;eigenvalue-decomposition&quot;&gt;Eigenvalue Decomposition&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;Eigenvalue decomposition of $\mathbf{A}$ is&lt;/li&gt;
+&lt;/ul&gt;
+
+\[\mathbf{A} = \mathbf{X} \Lambda \mathbf{X} ^{-1} \quad \text{or} \quad \mathbf{A} \mathbf{X} = \mathbf{X} \Lambda\]
+
+&lt;p&gt;with eigenvectors $\mathbf{x}$ i as columns of $\mathbf{X}$ and eigenvalues $\lambda_i$ along
+diagonal of $\Lambda$. Alternatively,&lt;/p&gt;
+
+\[\mathbf{A} \mathbf{x}_i = \lambda_i \mathbf{x}_i\]
+
+&lt;ul&gt;
+  &lt;li&gt;Eigenvalue decomposition is change of basis to “eigenvector
+coordinates”&lt;/li&gt;
+&lt;/ul&gt;
+
+\[\mathbf{A} \mathbf{x}  = \mathbf{b}  \rightarrow (\mathbf{X} \mathbf{b}^{-1}) =  \Lambda (\mathbf{X}^{-1} \mathbf{x})\]
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Note that eigenvalue decomposition may not exist&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Question: How does eigenvalue decomposition differ from SVD?&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;geometric-multiplicity&quot;&gt;Geometric Multiplicity&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Eigenvectors corresponding to a single eigenvalue $\lambda$ form an eigenspace $E_\lambda \subseteq  \mathbb{C}^{m \times m}$&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Eigenspace is invariant in that $\mathbf{A} E_\lambda \subseteq  E_\lambda$&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Dimension of $E_\lambda $ is the maximum number of linearly independent eigenvectors that can be found&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Geometric multiplicity of $\lambda$ is dimension of $E_\lambda$ , i.e., dim(null($\mathbf{A} - \lambda \mathbf{I}$ ))&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;algebraic-multiplicity&quot;&gt;Algebraic Multiplicity&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;The characteristic polynomial of A is degree m polynomial&lt;/li&gt;
+&lt;/ul&gt;
+
+\[p_\mathbf{A} (z) = det(z \mathbf{I} - \mathbf{A} )  = (z -\lambda_1 )(z -\lambda_2 ) \cdots (z - \lambda_m )\]
+
+&lt;p&gt;which is monic in that coefficient of $z^m$ is $1$&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;$\lambda$ is eigenvalue of $\mathbf{A}$ iff $p_\mathbf{A} (\lambda) = 0$&lt;/p&gt;
+
+    &lt;ul&gt;
+      &lt;li&gt;If $\lambda$ is eigenvalue, then by definition, $\lambda \mathbf{x} - \mathbf{A} \mathbf{x} = (\lambda \mathbf{I} - \mathbf{A}) \mathbf{x} = 0$, so
+$(\lambda \mathbf{I} - \mathbf{A})$ is singular and its determinant is $0$&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Algebraic multiplicity of $\lambda$ is its multiplicity as a root of
+$p_\mathbf{A}$&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Any matrix $\mathbf{A}$ has $m$ eigenvalues, counted with algebraic multiplicity&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Question: What are the eigenvalues of a triangular matrix?&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Question: How are geometric multiplicity and algebraic multiplicity
+related?&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;similarity-transformations&quot;&gt;Similarity Transformations&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;The map $\mathbf{A} \rightarrow \mathbf{Y}^{-1} \mathbf{A} \mathbf{Y}$ is a similarity transformation of $\mathbf{A}$ for any nonsingular $\mathbf{Y} \in \mathbb{C}^{m \times m}$&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;$\mathbf{A}$ and $\mathbf{B}$ are similar if there is similarity transformation $\mathbf{B} = \mathbf{Y}^{-1} \mathbf{A} \mathbf{Y}$&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;If $\mathbf{Y}$ is nonsingular, then $\mathbf{A}$ and $\mathbf{Y}^{-1} \mathbf{A} \mathbf{Y}$ have the same characteristic
+polynomials, eigenvalues, and algebraic and geometric multiplicities.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;For characteristic polynomial:
+\(det(z \mathbf{I} - \mathbf{Y}^{-1} \mathbf{A} \mathbf{Y}) = det(\mathbf{Y}^{-1} (z \mathbf{I} - \mathbf{A}) \mathbf{Y} ) = det(z \mathbf{I} - \mathbf{A})\)
+so algebraic multiplicities remain the same&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;If $\mathbf{x} \in \mathbf{E}_\lambda$ for $\mathbf{A}$, then $\mathbf{Y}^{-1} \mathbf{x}$ is in eigenspace of $\mathbf{Y}^{-1}\mathbf{A} \mathbf{Y}$ corresponding
+to $\lambda$, and vice versa, so geometric multiplicities remain the same
+\end{enumerate}&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;algebraic-multiplicity--geometric-multiplicity&quot;&gt;Algebraic Multiplicity ≥ Geometric Multiplicity&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Let $n$ be be geometric multiplicity of $\lambda$ for $\mathbf{A}$. Let $\hat{\mathbf{V}} \in \mathbb{C}^{m \times n}$&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;constitute of orthonormal basis of the $\mathbf{E}_{\lambda}$&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Extend $\hat{\mathbf{V}}$ to unitary $\mathbf{V} = [ \hat{\mathbf{V}} , \tilde{\mathbf{V}} ] \in \mathbb{C}^{m \times m}$ and form&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\(\mathbf{B} = \mathbf{V}^* \mathbf{A} \mathbf{V} = \begin{bmatrix}
+\hat{\mathbf{V}}^* \mathbf{A} \hat{\mathbf{V}}		&amp;amp; \hat{\mathbf{V}}^* \mathbf{A} \tilde{\mathbf{V}}\\
+\tilde{\mathbf{V}}^* \mathbf{A} \hat{\mathbf{V}}	&amp;amp;\tilde{\mathbf{V}}^* \mathbf{A} \tilde{\mathbf{V}}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\lambda \mathbf{I} 	&amp;amp;\mathbf{C} \\
+0							&amp;amp; \mathbf{D}
+\end{bmatrix}\)
+&lt;br /&gt;&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;det($z \mathbf{I} - \mathbf{B}$) = det($z \mathbf{I} - \lambda \mathbf{I}$ )det($z \mathbf{I} - \lambda \mathbf{D}$) = $(z - \lambda)^n$ det$(z \mathbf{I} - \lambda \mathbf{D})$, so
+the algebraic multiplicity of $\lambda$ as an eigenvalue of $\mathbf{B}$ is $\ge n$&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;$\mathbf{A}$ and $\mathbf{B}$ are similar, so the algebraic multiplicity of $\lambda$ as an eigenvalue
+of $\mathbf{A}$ is at least $\ge n$&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Examples:
+\(\mathbf{A} =
+\begin{bmatrix}
+2 &amp;amp; &amp;amp;\\
+&amp;amp;2 &amp;amp; \\
+&amp;amp;	&amp;amp;2
+\end{bmatrix}
+, \mathbf{B} =  
+\begin{bmatrix}
+2 &amp;amp;1 &amp;amp;\\
+&amp;amp;2 &amp;amp;1 \\
+&amp;amp;	&amp;amp;2
+\end{bmatrix}\)
+Their characteristic polynomial is $(z - 2)^3$ , so algebraic multiplicity of
+$\lambda = 2$ is $3$. But geometric multiplicity of $\mathbf{A}$ is $3$ and that of $\mathbf{B}$ is 1.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;defective-and-diagonalizable-matrices&quot;&gt;Defective and Diagonalizable Matrices&lt;/h2&gt;
+
+&lt;p&gt;item An eigenvalue of a matrix is defective if its algebraic multiplicity $&amp;gt;$ its
+geometric multiplicity&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;A matrix is defective if it has a defective eigenvalue. Otherwise, it is
+called nondefective.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;An $m \times m$ matrix $\mathbf{A}$ is nondefective iff it has an eigenvalue decomposition
+$\mathbf{A} = \mathbf{X} \Lambda \mathbf{X}^{-1}$.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;($\Leftarrow$) $\Lambda$ is nondefective, and $\mathbf{A}$ is similar to $\Lambda$, so $\mathbf{A}$ is nondefective.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;($\Rightarrow$) A nondefective matrix has m linearly independent eigenvectors.
+Take them as columns of $\mathbf{X}$ to obtain $\mathbf{A} = \mathbf{X} \Lambda \mathbf{X}^{-1}$.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Nondefective matrices are therefore also said to be diagonalizable.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;determinant-and-trace&quot;&gt;Determinant and Trace&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Determinant of $\mathbf{A}$ is det($\mathbf{A}$) = $\Pi_ {j=1}^m \lambda_j$, because&lt;/li&gt;
+&lt;/ul&gt;
+
+\[det(\mathbf{A}) = (-1)^m det(- \mathbf{A}) = (-1)^m p_{\mathbf{A}} (0) = \Pi_{j=1}^m \lambda_j\]
+
+&lt;ul&gt;
+  &lt;li&gt;Trace of $\mathbf{A}$ is tr($\mathbf{A}$) = $\sum^m_{j=1} \lambda_j$, since&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\(p_\mathbf{A} (z) = det( z \mathbf{I} - \mathbf{A} ) = z^m - \sum_{j=1}^m a_{jj} z^{m-1} + O(z^{m-2})\)
+\(p_\mathbf{A} (z) = \Pi_{j=1}^m( z - \lambda_j ) = z^m - \sum_{j=1}^m \lambda_{j} z^{m-1} + O(z^{m-2})\)&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Question: Are these results valid for defective or nondefective
+matrices?&lt;/li&gt;
+&lt;/ul&gt;</content><author><name></name></author><summary type="html">Eigenvalue and Eigenvectors</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="http://localhost:4000/numerical-linear-algebra/images/SVD-img1.png" /><media:content medium="image" url="http://localhost:4000/numerical-linear-algebra/images/SVD-img1.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Singular Value Decomposition</title><link href="http://localhost:4000/numerical-linear-algebra/2021/11/23/svd.html" rel="alternate" type="text/html" title="Singular Value Decomposition" /><published>2021-11-23T00:00:00+04:00</published><updated>2021-11-23T00:00:00+04:00</updated><id>http://localhost:4000/numerical-linear-algebra/2021/11/23/svd</id><content type="html" xml:base="http://localhost:4000/numerical-linear-algebra/2021/11/23/svd.html">&lt;h2 id=&quot;methodology&quot;&gt;Methodology&lt;/h2&gt;
+
+&lt;h3 id=&quot;geometric-interpretation&quot;&gt;Geometric interpretation&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;The image of unit sphere under any $m \times n$ matrix is a $hyperellipse$&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Give a unit sphere $\mathbf{S}$ in $\mathbb{R}^n$ , let $\mathbf{A} \mathbf{S}$ denote the shape after transformation&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;SVD is&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+\[\mathbf{A}= \mathbf{U} \mathbf{\Sigma} \mathbf{V}^*\]
+
+&lt;p&gt;where $\mathbf{U} \in \mathbb{C}^{m×m}$ and $\mathbf{V} \in \mathbb{C}^{n×n}$ is unitary and $\mathbf{\Sigma} \in \mathbb{R}^{m×n}$ is diagonal
+&lt;br /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Singular values are diagonal entries of $\mathbf{\Sigma}$, correspond to the principal semiaxes, with entries $\sigma_1 \ge \sigma_2 \ge \cdot \cdot \cdot \ge \sigma_n \ge 0$&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Left singular vectors of $\mathbf{A}$ are column vectors of $\mathbf{U}$ and are oriented in the directions of the principal semiaxes of $\mathbf{A} \mathbf{S}$&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Right singular vectors of $\mathbf{A}$ are column vectors of $\mathbf{V}$ and are the preimages of the principal semiaxes of $\mathbf{A} \mathbf{S}$&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;$\mathbf{A} \mathbf{v}_j = \sigma_j \mathbf{u}_j$ for $1 \le j \le n$&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;two-types-of-svd&quot;&gt;Two types of SVD&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Full SVD&lt;/strong&gt;: $\mathbf{U} \in \mathbb{C}^{m×m}$, $\mathbf{\Sigma} \in \mathbb{R}^{m×n}$ and $\mathbf{V} \in \mathbb{C}^{n×n}$ is&lt;/p&gt;
+
+\[\mathbf{A}= \mathbf{U} \mathbf{\Sigma} \mathbf{V}^*\]
+
+&lt;p&gt;&lt;strong&gt;Reduced SVD&lt;/strong&gt;: $\hat{\mathbf{U}} \in \mathbb{C}^{m×m}$, $\hat{\mathbf{\Sigma}} \in  \mathbb{R}^{n×n}$ (assume $m \ge n$)&lt;/p&gt;
+
+\[\mathbf{A}= \hat{\mathbf{U}} \hat{\mathbf{\Sigma}}  \mathbf{V}^*\]
+
+&lt;ul&gt;
+  &lt;li&gt;Furthermore, notice that&lt;/li&gt;
+&lt;/ul&gt;
+
+\[\mathbf{A}= \sum^{min\{m,n\}}_{i=1} \sigma_i \mathbf{u}_i \mathbf{v}_i\]
+
+&lt;p&gt;so we can keep only entries of $\mathbf{U}$ and $\mathbf{V}$ corresponding to nonzero $\sigma_i$&lt;/p&gt;
+
+&lt;h3 id=&quot;existence-of-svd&quot;&gt;Existence of SVD&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;Every matrix $\mathbf{A} \in \mathbb{C}^{m×n}$ has an SVD&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;Proof: Let $\sigma = \Vert{A}\Vert_2$. There exists $\mathbf{v}_1 \in \mathbb{C}^n$ with $\Vert{v_1}\Vert_2 = 1$ and
+$\Vert{Av_1}\Vert_2 = \sigma_1$ . Let $\mathbf{U}_1$ and $\mathbf{V}_1$ be unitary matrices whose first columns are
+ $\mathbf{v}_1= \frac{\mathbf{A} \mathbf{v}_1}{\sigma_1}$ (or any unit-length vector if $\sigma_1 = 0$) and $\mathbf{v}_1$, respectively.
+&lt;br /&gt;
+Note that&lt;/p&gt;
+
+\[\mathbf{U}_1^* \mathbf{A} \mathbf{V}_1 = \mathbf{S}= \begin{bmatrix}
+    \sigma_1 &amp;amp; \omega^* \\
+    \mathbf{0} &amp;amp; \mathbf{B}
+\end{bmatrix}\]
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;Furthermore, $\omega =0$ because $\Vert{S}\Vert_2 = \sigma_1$, and&lt;/p&gt;
+
+&lt;p&gt;\(\Biggl\Vert{\begin{bmatrix}
+    \sigma_1 &amp;amp; \omega^*  \\
+    \mathbf{0} &amp;amp; \mathbf{B}
+  \end{bmatrix} \begin{bmatrix}
+    \sigma_1  \\
+   \omega
+  \end{bmatrix}}\)
+  $\ge \sigma_1^2+ \omega^* \omega = \sqrt{\sigma_1^2 + \omega^* \omega} \begin{bmatrix}
+    \sigma_1  &lt;br /&gt;
+   \omega
+  \end{bmatrix}\Biggl\Vert_2 $&lt;/p&gt;
+
+&lt;p&gt;implying that $\omega_1 \ge \sqrt{\sigma_1^2 + \omega^* \omega}$ and $\omega =0$&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;We then prove by induction using (1). If $m = 1$ or $n = 1$, then $\mathbf{B}$ is empty and we have $\mathbf{A} = \mathbf{U}_1 \mathbf{S}\mathbf{V}^*_1$.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Otherwise, suppose $\mathbf{B} = \mathbf{U}_2 \mathbf{\Sigma}_2 \mathbf{V}^*_2$ , and then&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+\[\underbrace{\mathbf{U}_1\begin{bmatrix}
+    \sigma_1 &amp;amp; \mathbf{0}^*  \\
+    \mathbf{0} &amp;amp; \mathbf{\Sigma}_2
+  \end{bmatrix}}_\mathbf{U}\underbrace{\begin{bmatrix}
+    \sigma_1 &amp;amp; \mathbf{0}^*  \\
+    \mathbf{0} &amp;amp; \mathbf{\Sigma}_2
+  \end{bmatrix}}_\mathbf{\Sigma}\underbrace{\begin{bmatrix}
+    1 &amp;amp; \mathbf{0}^*  \\
+    \mathbf{0} &amp;amp; \mathbf{V}^*_2
+  \end{bmatrix}\mathbf{V_1}^*}_\mathbf{V^*}\]
+
+&lt;p&gt;where $\mathbf{U}$ and $\mathbf{V}$ are unitary.&lt;/p&gt;
+
+&lt;h3 id=&quot;uniquesness-of-svd&quot;&gt;Uniquesness of SVD&lt;/h3&gt;
+
+&lt;blockquote title=&quot;Blockquote title&quot;&gt;
+  &lt;p&gt;
+  Theorem:
+
+  (Uniqueness) The singular values $\{\sigma_j \}$ are uniquely determined. If $\mathbf{A}$ is
+  square and the $\sigma_j$ are distinct, the left and right singular vectors are
+  uniquely determined up to complex signs (i.e., complex scalar factors of
+  absolute value 1).&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Geometric argument: If the lengths of semiaxes of a hyperellipse are
+distinct, then the semiaxes themselves are determined by the geometry up
+to signs.&lt;/p&gt;
+
+&lt;p&gt;Algebraic argument: Based on 2-norm and prove by induction. Consider
+the case where the $\sigma_j$ are distinct. The 2-norm is unique, so is $\sigma_1$.If $\mathbf{v}_1$ is not unique up to sign, then the orthonormal bases of these vectors are right singular vectors of $\mathbf{A}$, implying that $\sigma_1$ is not a simple singular value.&lt;/p&gt;
+
+&lt;p&gt;Once $\sigma_1$ , $\mathbf{v}_1$ , and $\mathbf{v}_1$ are determined, the remainder of SVD is determined
+by the space orthogonal to $\mathbf{v}_1$ . Because $\mathbf{v}_1$ is unique up to sign, the orthogonal subspace is uniquely defined. Then prove by induction&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Question: What if we change the sign of a singular vector?&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Question: What if $\sigma_i$ is not distinct?&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;matrix-properties-via-svd&quot;&gt;Matrix Properties via SVD&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;Let $r$ be number of nonzero singular values of $\mathbf{A} \in \mathbb{C}^{m x n}$
+    &lt;ul&gt;
+      &lt;li&gt;rank($\mathbf{A}$)  is $r$&lt;/li&gt;
+      &lt;li&gt;range($\mathbf{A}$) $=&amp;lt;\mathbf{u}_1, \mathbf{u}_2, …, \mathbf{u}_r&amp;gt;$&lt;/li&gt;
+      &lt;li&gt;null($\mathbf{A}$) $=&amp;lt;\mathbf{u}_{r+1}, \mathbf{u}_r, …, \mathbf{u}_r&amp;gt;$
+&lt;br /&gt;
+2-norm and Frobenius norm&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;$\Vert{A}\Vert_2 = \sigma_1$ and $\Vert{A}\Vert_F= \sqrt{\sum_i \sigma_i^2}$&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Determinant of matrix
+For $\mathbf{A} \in \mathbb{C}^{m x n}$, $|det(\mathbf{A})|= \Pi_{i=1}^m \sigma_i$&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;However, SVD may not be the most efficient way in solving problems&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;code&quot;&gt;Code&lt;/h2&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;svd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Sigma&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Vh&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;linalg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;svd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;full_matrices&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# It&apos;s not necessary to compute the full matrix of U or V
+&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;compute_uv&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;strong&gt;Reconstructing an image with Lower Rank&lt;/strong&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;imread&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;selfie.PNG&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#averaging over 3rd dimension for 2D
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;img&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;imshow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;img&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;set_cmap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;gray&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Original image&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+
+
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Rank&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;shape&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Vt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;linalg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;svd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;full_matrices&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;rank&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;rank&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rank&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;Rank&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;reconstruct_w_lower_Sigma&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rank&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Vt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;linalg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;svd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;full_matrices&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;diag&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rank&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Rec_pic&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Vt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:])&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;figure&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;img&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;imshow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Rec_pic&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;img&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;set_cmap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;gray&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;k=&apos;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;rank&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;30&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;35&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;45&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;70&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;reconstruct_w_lower_Sigma&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rank&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h2 id=&quot;applications-to-image-processing&quot;&gt;Applications to Image processing&lt;/h2&gt;
+
+&lt;h4 id=&quot;why-svd&quot;&gt;&lt;strong&gt;Why SVD?&lt;/strong&gt;&lt;/h4&gt;
+&lt;p&gt;Digital images require large amounts of memory, and often we would like to reduce the required memory storage
+and still retain as much of the image quality as possible. We can consider using the singular value decomposition
+(SVD) to manipulate these large sets of data, which will allow us to identify the components of the image which
+contribute the least to overall image quality.&lt;/p&gt;
+
+&lt;div style=&quot;text-align: center;&quot;&gt; &lt;img src=&quot;/numerical-linear-algebra/images/SVD-img1.png&quot; height=&quot;300&quot; width=&quot;1800&quot; /&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;image-proccessing&quot;&gt;&lt;strong&gt;Image Proccessing&lt;/strong&gt;&lt;/h4&gt;
+
+&lt;p&gt;We compute the SVD of that matrix and remove the singular
+values (from smallest to largest), converting the modified
+matrices (with removed values) back into a series of images.
+This process of decomposition can reduce the image storage
+size without losing the quality needed to fully represent the
+image.
+In Figure 2 we can see that as more singular values are
+included in the image matrix, the clarity of the image improves&lt;/p&gt;
+
+&lt;div style=&quot;text-align: center;&quot;&gt; &lt;img src=&quot;/numerical-linear-algebra/images/SVD-img2.png&quot; height=&quot;150&quot; width=&quot;350&quot; /&gt;
+&lt;/div&gt;</content><author><name></name></author><summary type="html">Methodology</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="http://localhost:4000/numerical-linear-algebra/images/SVD-img1.png" /><media:content medium="image" url="http://localhost:4000/numerical-linear-algebra/images/SVD-img1.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Norms</title><link href="http://localhost:4000/numerical-linear-algebra/2021/11/21/norms.html" rel="alternate" type="text/html" title="Norms" /><published>2021-11-21T00:00:00+04:00</published><updated>2021-11-21T00:00:00+04:00</updated><id>http://localhost:4000/numerical-linear-algebra/2021/11/21/norms</id><content type="html" xml:base="http://localhost:4000/numerical-linear-algebra/2021/11/21/norms.html">&lt;p&gt;A norm is a &lt;strong&gt;function that&lt;/strong&gt; assigns a real-valued length to
+each vector. In order to conform to a reasonable notion of length, a norm
+must satisfy the following three conditions. For all vectors $x$ and $y$ and for all
+scalars $c$  $\in$ $\mathbb{C}$,&lt;/p&gt;
+
+&lt;div style=&quot;float: right;&quot;&gt; &lt;img src=&quot;/numerical-linear-algebra/images/norm-img.png&quot; height=&quot;220&quot; width=&quot;400&quot; /&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;conditions&quot;&gt;Conditions&lt;/h3&gt;
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;$\Vert{x}\Vert \ge 0$ and $\Vert{x}\Vert = 0$ only if $x = 0$&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;$\Vert{x+y}\Vert ≤ \Vert{x}\Vert + \Vert{y}\Vert$&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;$\Vert{cx}\Vert = c\Vert{x}\Vert$&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;h3 id=&quot;matrix-norms-induced-by-vector-norms&quot;&gt;Matrix Norms Induced by Vector Norms&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Action of A is determined by unit vectors&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Matrix norm is stretch&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\(\Vert{A}\Vert_1\) = Maximum of 1-norm of column vectors of $A$&lt;/p&gt;
+
+&lt;p&gt;\(\Vert{A}\Vert_2\) = Largest singular value&lt;/p&gt;
+
+&lt;p&gt;$\Vert{A}\Vert_{\infty}$  = Maximum of 1-norm of column vectors of $A^{T}$&lt;/p&gt;
+
+&lt;div style=&quot;text-align: center;&quot;&gt; &lt;img src=&quot;/numerical-linear-algebra/images/mat-norm-img.png&quot; height=&quot;300&quot; width=&quot;500&quot; /&gt; &lt;figcaption&gt; fig2 - Dashed line mark the vectors most amplified by A &lt;/figcaption&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;code&quot;&gt;Code&lt;/h3&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;numpy&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([[&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;9&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]])&lt;/span&gt;
+
+
+&lt;span class=&quot;c1&quot;&gt;#L1 norm
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;one&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;norm&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;linalg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;norm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;ord&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;#L2 norm
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;two&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;norm&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;linalg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;norm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;#Infinity norm
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;inf_norm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;abs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;matrix&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;</content><author><name></name></author><summary type="html">A norm is a function that assigns a real-valued length to each vector. In order to conform to a reasonable notion of length, a norm must satisfy the following three conditions. For all vectors $x$ and $y$ and for all scalars $c$ $\in$ $\mathbb{C}$,</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="http://localhost:4000/numerical-linear-algebra/images/norm-img.png" /><media:content medium="image" url="http://localhost:4000/numerical-linear-algebra/images/norm-img.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>

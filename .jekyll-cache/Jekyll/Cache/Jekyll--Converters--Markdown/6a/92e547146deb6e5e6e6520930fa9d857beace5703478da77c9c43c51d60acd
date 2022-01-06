@@ -1,0 +1,28 @@
+I"½<p><strong>Differences</strong></p>
+
+<ul>
+  <li>
+    <p>Not every matrix has eigenvalue decomposition, but every matrix has singular value decomposition</p>
+  </li>
+  <li>
+    <p>Eigenvalues may not always be real numbers, but singular values are always non-negative real numbers</p>
+  </li>
+  <li>
+    <p>Eigenvectors are not always orthogonal to each other (orthogonal for symmetric matrices), but left (or right) singular vectors are orthogonal to each other</p>
+  </li>
+</ul>
+
+<p><strong>Similarities</strong></p>
+
+<ul>
+  <li>
+    <p>Singular values of A are square roots of eigenvalues of $AA^*$ and $A^âˆ—A$, and their eigenvectors are left and right singular vectors, respectively</p>
+  </li>
+  <li>
+    <p>Singular values of hermitian matrices are absolute values of eigenvalues, and eigenvectors are singular vectors (up to complex signs)</p>
+  </li>
+  <li>
+    <p>This relationship can be used to compute singular values by hand</p>
+  </li>
+</ul>
+:ET

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Singular Value Decomposition | NLA blog</title>
+<meta name="generator" content="Jekyll v4.2.1" />
+<meta property="og:title" content="Singular Value Decomposition" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Methodology" />
+<meta property="og:description" content="Methodology" />
+<link rel="canonical" href="http://localhost:4000/numerical-linear-algebra/2021/11/23/svd.html" />
+<meta property="og:url" content="http://localhost:4000/numerical-linear-algebra/2021/11/23/svd.html" />
+<meta property="og:site_name" content="NLA blog" />
+<meta property="og:image" content="http://localhost:4000/numerical-linear-algebra/images/SVD-img1.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-11-23T00:00:00+04:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="http://localhost:4000/numerical-linear-algebra/images/SVD-img1.png" />
+<meta property="twitter:title" content="Singular Value Decomposition" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/numerical-linear-algebra/2021/11/23/svd.html","image":"http://localhost:4000/numerical-linear-algebra/images/SVD-img1.png","headline":"Singular Value Decomposition","dateModified":"2021-11-23T00:00:00+04:00","datePublished":"2021-11-23T00:00:00+04:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/numerical-linear-algebra/2021/11/23/svd.html"},"description":"Methodology","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/numerical-linear-algebra/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/numerical-linear-algebra/feed.xml" title="NLA blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/numerical-linear-algebra/">NLA blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/numerical-linear-algebra/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Singular Value Decomposition</h1>
+    <p class="post-meta"><time class="dt-published" datetime="2021-11-23T00:00:00+04:00" itemprop="datePublished">
+        Nov 23, 2021
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h2"><a href="#methodology">Methodology</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#geometric-interpretation">Geometric interpretation</a></li>
+<li class="toc-entry toc-h3"><a href="#two-types-of-svd">Two types of SVD</a></li>
+<li class="toc-entry toc-h3"><a href="#existence-of-svd">Existence of SVD</a></li>
+<li class="toc-entry toc-h3"><a href="#uniquesness-of-svd">Uniquesness of SVD</a></li>
+<li class="toc-entry toc-h3"><a href="#matrix-properties-via-svd">Matrix Properties via SVD</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#code">Code</a></li>
+<li class="toc-entry toc-h2"><a href="#applications-to-image-processing">Applications to Image processing</a>
+<ul>
+<li class="toc-entry toc-h4"><a href="#why-svd">Why SVD?</a></li>
+<li class="toc-entry toc-h4"><a href="#image-proccessing">Image Proccessing</a></li>
+</ul>
+</li>
+</ul><h2 id="methodology">
+<a class="anchor" href="#methodology" aria-hidden="true"><span class="octicon octicon-link"></span></a>Methodology</h2>
+
+<h3 id="geometric-interpretation">
+<a class="anchor" href="#geometric-interpretation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Geometric interpretation</h3>
+<ul>
+  <li>
+    <p>The image of unit sphere under any $m \times n$ matrix is a $hyperellipse$</p>
+  </li>
+  <li>
+    <p>Give a unit sphere $\mathbf{S}$ in $\mathbb{R}^n$ , let $\mathbf{A} \mathbf{S}$ denote the shape after transformation</p>
+  </li>
+  <li>
+    <p>SVD is</p>
+  </li>
+</ul>
+
+\[\mathbf{A}= \mathbf{U} \mathbf{\Sigma} \mathbf{V}^*\]
+
+<p>where $\mathbf{U} \in \mathbb{C}^{m×m}$ and $\mathbf{V} \in \mathbb{C}^{n×n}$ is unitary and $\mathbf{\Sigma} \in \mathbb{R}^{m×n}$ is diagonal
+<br></p>
+
+<ul>
+  <li>
+    <p>Singular values are diagonal entries of $\mathbf{\Sigma}$, correspond to the principal semiaxes, with entries $\sigma_1 \ge \sigma_2 \ge \cdot \cdot \cdot \ge \sigma_n \ge 0$</p>
+  </li>
+  <li>
+    <p>Left singular vectors of $\mathbf{A}$ are column vectors of $\mathbf{U}$ and are oriented in the directions of the principal semiaxes of $\mathbf{A} \mathbf{S}$</p>
+  </li>
+  <li>
+    <p>Right singular vectors of $\mathbf{A}$ are column vectors of $\mathbf{V}$ and are the preimages of the principal semiaxes of $\mathbf{A} \mathbf{S}$</p>
+  </li>
+  <li>
+    <p>$\mathbf{A} \mathbf{v}_j = \sigma_j \mathbf{u}_j$ for $1 \le j \le n$</p>
+  </li>
+</ul>
+
+<p><br></p>
+
+<h3 id="two-types-of-svd">
+<a class="anchor" href="#two-types-of-svd" aria-hidden="true"><span class="octicon octicon-link"></span></a>Two types of SVD</h3>
+<p><strong>Full SVD</strong>: $\mathbf{U} \in \mathbb{C}^{m×m}$, $\mathbf{\Sigma} \in \mathbb{R}^{m×n}$ and $\mathbf{V} \in \mathbb{C}^{n×n}$ is</p>
+
+\[\mathbf{A}= \mathbf{U} \mathbf{\Sigma} \mathbf{V}^*\]
+
+<p><strong>Reduced SVD</strong>: $\hat{\mathbf{U}} \in \mathbb{C}^{m×m}$, $\hat{\mathbf{\Sigma}} \in  \mathbb{R}^{n×n}$ (assume $m \ge n$)</p>
+
+\[\mathbf{A}= \hat{\mathbf{U}} \hat{\mathbf{\Sigma}}  \mathbf{V}^*\]
+
+<ul>
+  <li>Furthermore, notice that</li>
+</ul>
+
+\[\mathbf{A}= \sum^{min\{m,n\}}_{i=1} \sigma_i \mathbf{u}_i \mathbf{v}_i\]
+
+<p>so we can keep only entries of $\mathbf{U}$ and $\mathbf{V}$ corresponding to nonzero $\sigma_i$</p>
+
+<h3 id="existence-of-svd">
+<a class="anchor" href="#existence-of-svd" aria-hidden="true"><span class="octicon octicon-link"></span></a>Existence of SVD</h3>
+
+<p><strong>Every matrix $\mathbf{A} \in \mathbb{C}^{m×n}$ has an SVD</strong></p>
+
+<p><br></p>
+
+<p>Proof: Let $\sigma = \Vert{A}\Vert_2$. There exists $\mathbf{v}_1 \in \mathbb{C}^n$ with $\Vert{v_1}\Vert_2 = 1$ and
+$\Vert{Av_1}\Vert_2 = \sigma_1$ . Let $\mathbf{U}_1$ and $\mathbf{V}_1$ be unitary matrices whose first columns are
+ $\mathbf{v}_1= \frac{\mathbf{A} \mathbf{v}_1}{\sigma_1}$ (or any unit-length vector if $\sigma_1 = 0$) and $\mathbf{v}_1$, respectively.
+<br>
+Note that</p>
+
+\[\mathbf{U}_1^* \mathbf{A} \mathbf{V}_1 = \mathbf{S}= \begin{bmatrix}
+    \sigma_1 &amp; \omega^* \\
+    \mathbf{0} &amp; \mathbf{B}
+\end{bmatrix}\]
+
+<p><br></p>
+
+<p>Furthermore, $\omega =0$ because $\Vert{S}\Vert_2 = \sigma_1$, and</p>
+
+<p>\(\Biggl\Vert{\begin{bmatrix}
+    \sigma_1 &amp; \omega^*  \\
+    \mathbf{0} &amp; \mathbf{B}
+  \end{bmatrix} \begin{bmatrix}
+    \sigma_1  \\
+   \omega
+  \end{bmatrix}}\)
+  $\ge \sigma_1^2+ \omega^* \omega = \sqrt{\sigma_1^2 + \omega^* \omega} \begin{bmatrix}
+    \sigma_1  <br>
+   \omega
+  \end{bmatrix}\Biggl\Vert_2 $</p>
+
+<p>implying that $\omega_1 \ge \sqrt{\sigma_1^2 + \omega^* \omega}$ and $\omega =0$</p>
+
+<ul>
+  <li>
+    <p>We then prove by induction using (1). If $m = 1$ or $n = 1$, then $\mathbf{B}$ is empty and we have $\mathbf{A} = \mathbf{U}_1 \mathbf{S}\mathbf{V}^*_1$.</p>
+  </li>
+  <li>
+    <p>Otherwise, suppose $\mathbf{B} = \mathbf{U}_2 \mathbf{\Sigma}_2 \mathbf{V}^*_2$ , and then</p>
+  </li>
+</ul>
+
+\[\underbrace{\mathbf{U}_1\begin{bmatrix}
+    \sigma_1 &amp; \mathbf{0}^*  \\
+    \mathbf{0} &amp; \mathbf{\Sigma}_2
+  \end{bmatrix}}_\mathbf{U}\underbrace{\begin{bmatrix}
+    \sigma_1 &amp; \mathbf{0}^*  \\
+    \mathbf{0} &amp; \mathbf{\Sigma}_2
+  \end{bmatrix}}_\mathbf{\Sigma}\underbrace{\begin{bmatrix}
+    1 &amp; \mathbf{0}^*  \\
+    \mathbf{0} &amp; \mathbf{V}^*_2
+  \end{bmatrix}\mathbf{V_1}^*}_\mathbf{V^*}\]
+
+<p>where $\mathbf{U}$ and $\mathbf{V}$ are unitary.</p>
+
+<h3 id="uniquesness-of-svd">
+<a class="anchor" href="#uniquesness-of-svd" aria-hidden="true"><span class="octicon octicon-link"></span></a>Uniquesness of SVD</h3>
+
+<blockquote title="Blockquote title">
+  <p>
+  Theorem:
+
+  (Uniqueness) The singular values $\{\sigma_j \}$ are uniquely determined. If $\mathbf{A}$ is
+  square and the $\sigma_j$ are distinct, the left and right singular vectors are
+  uniquely determined up to complex signs (i.e., complex scalar factors of
+  absolute value 1).</p>
+</blockquote>
+
+<p>Geometric argument: If the lengths of semiaxes of a hyperellipse are
+distinct, then the semiaxes themselves are determined by the geometry up
+to signs.</p>
+
+<p>Algebraic argument: Based on 2-norm and prove by induction. Consider
+the case where the $\sigma_j$ are distinct. The 2-norm is unique, so is $\sigma_1$.If $\mathbf{v}_1$ is not unique up to sign, then the orthonormal bases of these vectors are right singular vectors of $\mathbf{A}$, implying that $\sigma_1$ is not a simple singular value.</p>
+
+<p>Once $\sigma_1$ , $\mathbf{v}_1$ , and $\mathbf{v}_1$ are determined, the remainder of SVD is determined
+by the space orthogonal to $\mathbf{v}_1$ . Because $\mathbf{v}_1$ is unique up to sign, the orthogonal subspace is uniquely defined. Then prove by induction</p>
+
+<ul>
+  <li>
+    <p>Question: What if we change the sign of a singular vector?</p>
+  </li>
+  <li>
+    <p>Question: What if $\sigma_i$ is not distinct?</p>
+  </li>
+</ul>
+
+<h3 id="matrix-properties-via-svd">
+<a class="anchor" href="#matrix-properties-via-svd" aria-hidden="true"><span class="octicon octicon-link"></span></a>Matrix Properties via SVD</h3>
+<ul>
+  <li>Let $r$ be number of nonzero singular values of $\mathbf{A} \in \mathbb{C}^{m x n}$
+    <ul>
+      <li>rank($\mathbf{A}$)  is $r$</li>
+      <li>range($\mathbf{A}$) $=&lt;\mathbf{u}_1, \mathbf{u}_2, …, \mathbf{u}_r&gt;$</li>
+      <li>null($\mathbf{A}$) $=&lt;\mathbf{u}_{r+1}, \mathbf{u}_r, …, \mathbf{u}_r&gt;$
+<br>
+2-norm and Frobenius norm</li>
+    </ul>
+  </li>
+  <li>$\Vert{A}\Vert_2 = \sigma_1$ and $\Vert{A}\Vert_F= \sqrt{\sum_i \sigma_i^2}$</li>
+</ul>
+
+<p>Determinant of matrix
+For $\mathbf{A} \in \mathbb{C}^{m x n}$, $|det(\mathbf{A})|= \Pi_{i=1}^m \sigma_i$</p>
+
+<ul>
+  <li>However, SVD may not be the most efficient way in solving problems</li>
+</ul>
+
+<h2 id="code">
+<a class="anchor" href="#code" aria-hidden="true"><span class="octicon octicon-link"></span></a>Code</h2>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">svd</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+    <span class="n">U</span><span class="p">,</span> <span class="n">Sigma</span><span class="p">,</span> <span class="n">Vh</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="n">svd</span><span class="p">(</span><span class="n">X</span><span class="p">,</span>
+      <span class="n">full_matrices</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="c1"># It's not necessary to compute the full matrix of U or V
+</span>      <span class="n">compute_uv</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></code></pre></figure>
+
+<p><strong>Reconstructing an image with Lower Rank</strong></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">A</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="s">"selfie.PNG"</span><span class="p">)</span>
+<span class="n">X</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="c1">#averaging over 3rd dimension for 2D
+</span><span class="n">img</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">img</span><span class="p">.</span><span class="n">set_cmap</span><span class="p">(</span><span class="s">'gray'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">"Original image"</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+
+<span class="k">def</span> <span class="nf">Rank</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"shape"</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">M</span><span class="p">))</span>
+    <span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">Vt</span><span class="p">)</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="n">svd</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">rank</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">return</span> <span class="k">print</span><span class="p">(</span><span class="s">"rank"</span><span class="p">,</span><span class="n">rank</span><span class="p">)</span>
+
+<span class="n">Rank</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">reconstruct_w_lower_Sigma</span><span class="p">(</span><span class="n">M</span><span class="p">,</span><span class="n">rank</span><span class="p">):</span>
+    <span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">Vt</span><span class="p">)</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="n">svd</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">rank</span><span class="p">:</span>
+        <span class="n">Rec_pic</span> <span class="o">=</span> <span class="n">U</span><span class="p">[:,</span> <span class="p">:</span><span class="n">k</span><span class="p">].</span><span class="n">dot</span><span class="p">(</span><span class="n">S</span><span class="p">[:</span><span class="n">k</span><span class="p">,</span> <span class="p">:</span><span class="n">k</span><span class="p">]).</span><span class="n">dot</span><span class="p">(</span><span class="n">Vt</span><span class="p">[:</span><span class="n">k</span><span class="p">,</span> <span class="p">:])</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">Rec_pic</span><span class="p">)</span>
+        <span class="n">img</span><span class="p">.</span><span class="n">set_cmap</span><span class="p">(</span><span class="s">'gray'</span><span class="p">)</span>
+        <span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'k='</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+        <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">rank</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">35</span><span class="p">,</span><span class="mi">45</span><span class="p">,</span><span class="mi">70</span><span class="p">]</span>
+<span class="n">reconstruct_w_lower_Sigma</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">rank</span><span class="p">)</span></code></pre></figure>
+
+<h2 id="applications-to-image-processing">
+<a class="anchor" href="#applications-to-image-processing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Applications to Image processing</h2>
+
+<h4 id="why-svd">
+<a class="anchor" href="#why-svd" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Why SVD?</strong>
+</h4>
+<p>Digital images require large amounts of memory, and often we would like to reduce the required memory storage
+and still retain as much of the image quality as possible. We can consider using the singular value decomposition
+(SVD) to manipulate these large sets of data, which will allow us to identify the components of the image which
+contribute the least to overall image quality.</p>
+
+<div style="text-align: center;"> <img src="/numerical-linear-algebra/images/SVD-img1.png" height="300" width="1800">
+</div>
+<p><br></p>
+
+<h4 id="image-proccessing">
+<a class="anchor" href="#image-proccessing" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Image Proccessing</strong>
+</h4>
+
+<p>We compute the SVD of that matrix and remove the singular
+values (from smallest to largest), converting the modified
+matrices (with removed values) back into a series of images.
+This process of decomposition can reduce the image storage
+size without losing the quality needed to fully represent the
+image.
+In Figure 2 we can see that as more singular values are
+included in the image matrix, the clarity of the image improves</p>
+
+<div style="text-align: center;"> <img src="/numerical-linear-algebra/images/SVD-img2.png" height="150" width="350">
+</div>
+
+  </div><a class="u-url" href="/numerical-linear-algebra/2021/11/23/svd.html" hidden></a>
+
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/numerical-linear-algebra/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">NLA blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">NLA blog</li><li><a class="u-email" href="mailto:your-email@example.com">your-email@example.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/jekyll"><svg class="svg-icon"><use xlink:href="/numerical-linear-algebra/assets/minima-social-icons.svg#github"></use></svg> <span class="username">jekyll</span></a></li><li><a href="https://www.twitter.com/jekyllrb"><svg class="svg-icon"><use xlink:href="/numerical-linear-algebra/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">jekyllrb</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      extensions: ["tex2jax.js"],
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+        processEscapes: true
+      },
+      "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+
+
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>

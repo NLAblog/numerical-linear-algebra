@@ -1,0 +1,228 @@
+I"�<h2 id="eigenvalue-and-eigenvectors">Eigenvalue and Eigenvectors</h2>
+
+<ul>
+  <li>Eigenvalue problem of $m \times m$ matrix $\mathbf{A}$ is</li>
+</ul>
+
+\[\mathbf{A} \mathbf{x} = \lambda \mathbf{x}\]
+
+<p>with eigenvalues $\lambda$ and eigenvectors $\mathbf{x}$ (nonzero)</p>
+
+<ul>
+  <li>
+    <p>The set of all the eigenvalues of $\mathbf{A}$ is the spectrum of $\mathbf{A}$</p>
+  </li>
+  <li>
+    <p>Eigenvalue are generally used where a matrix is to be compounded iteratively</p>
+  </li>
+  <li>
+    <p>Eigenvalues are useful for algorithmic and physical reasons</p>
+    <ul>
+      <li>Algorithmically, eigenvalue analysis can reduce a coupled system to a
+collection of scalar problems</li>
+      <li>Physically, eigenvalue analysis can be used to study resonance of
+musical instruments and stability of physical systems</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="eigenvalue-decomposition">Eigenvalue Decomposition</h2>
+<ul>
+  <li>Eigenvalue decomposition of $\mathbf{A}$ is</li>
+</ul>
+
+\[\mathbf{A} = \mathbf{X} \Lambda \mathbf{X} ^{-1} \quad \text{or} \quad \mathbf{A} \mathbf{X} = \mathbf{X} \Lambda\]
+
+<p>with eigenvectors $\mathbf{x}$ i as columns of $\mathbf{X}$ and eigenvalues $\lambda_i$ along
+diagonal of $\Lambda$. Alternatively,</p>
+
+\[\mathbf{A} \mathbf{x}_i = \lambda_i \mathbf{x}_i\]
+
+<ul>
+  <li>Eigenvalue decomposition is change of basis to “eigenvector
+coordinates”</li>
+</ul>
+
+\[\mathbf{A} \mathbf{x}  = \mathbf{b}  \rightarrow (\mathbf{X} \mathbf{b}^{-1}) =  \Lambda (\mathbf{X}^{-1} \mathbf{x})\]
+
+<ul>
+  <li>
+    <p>Note that eigenvalue decomposition may not exist</p>
+  </li>
+  <li>
+    <p>Question: How does eigenvalue decomposition differ from SVD?</p>
+  </li>
+</ul>
+
+<h2 id="geometric-multiplicity">Geometric Multiplicity</h2>
+
+<ul>
+  <li>
+    <p>Eigenvectors corresponding to a single eigenvalue $\lambda$ form an eigenspace $E_\lambda \subseteq  \mathbb{C}^{m \times m}$</p>
+  </li>
+  <li>
+    <p>Eigenspace is invariant in that $\mathbf{A} E_\lambda \subseteq  E_\lambda$</p>
+  </li>
+  <li>
+    <p>Dimension of $E_\lambda $ is the maximum number of linearly independent eigenvectors that can be found</p>
+  </li>
+  <li>
+    <p>Geometric multiplicity of $\lambda$ is dimension of $E_\lambda$ , i.e., dim(null($\mathbf{A} - \lambda \mathbf{I}$ ))</p>
+  </li>
+</ul>
+
+<h2 id="algebraic-multiplicity">Algebraic Multiplicity</h2>
+<ul>
+  <li>The characteristic polynomial of A is degree m polynomial</li>
+</ul>
+
+\[p_\mathbf{A} (z) = det(z \mathbf{I} - \mathbf{A} )  = (z -\lambda_1 )(z -\lambda_2 ) \cdots (z - \lambda_m )\]
+
+<p>which is monic in that coefficient of $z^m$ is $1$</p>
+
+<ul>
+  <li>
+    <p>$\lambda$ is eigenvalue of $\mathbf{A}$ iff $p_\mathbf{A} (\lambda) = 0$</p>
+
+    <ul>
+      <li>If $\lambda$ is eigenvalue, then by definition, $\lambda \mathbf{x} - \mathbf{A} \mathbf{x} = (\lambda \mathbf{I} - \mathbf{A}) \mathbf{x} = 0$, so
+$(\lambda \mathbf{I} - \mathbf{A})$ is singular and its determinant is $0$</li>
+    </ul>
+  </li>
+  <li>
+    <p>Algebraic multiplicity of $\lambda$ is its multiplicity as a root of
+$p_\mathbf{A}$</p>
+  </li>
+  <li>
+    <p>Any matrix $\mathbf{A}$ has $m$ eigenvalues, counted with algebraic multiplicity</p>
+  </li>
+  <li>
+    <p>Question: What are the eigenvalues of a triangular matrix?</p>
+  </li>
+  <li>
+    <p>Question: How are geometric multiplicity and algebraic multiplicity
+related?</p>
+  </li>
+</ul>
+
+<h2 id="similarity-transformations">Similarity Transformations</h2>
+
+<ul>
+  <li>
+    <p>The map $\mathbf{A} \rightarrow \mathbf{Y}^{-1} \mathbf{A} \mathbf{Y}$ is a similarity transformation of $\mathbf{A}$ for any nonsingular $\mathbf{Y} \in \mathbb{C}^{m \times m}$</p>
+  </li>
+  <li>
+    <p>$\mathbf{A}$ and $\mathbf{B}$ are similar if there is similarity transformation $\mathbf{B} = \mathbf{Y}^{-1} \mathbf{A} \mathbf{Y}$</p>
+  </li>
+</ul>
+
+<p>If $\mathbf{Y}$ is nonsingular, then $\mathbf{A}$ and $\mathbf{Y}^{-1} \mathbf{A} \mathbf{Y}$ have the same characteristic
+polynomials, eigenvalues, and algebraic and geometric multiplicities.</p>
+
+<ol>
+  <li>
+    <p>For characteristic polynomial:
+\(det(z \mathbf{I} - \mathbf{Y}^{-1} \mathbf{A} \mathbf{Y}) = det(\mathbf{Y}^{-1} (z \mathbf{I} - \mathbf{A}) \mathbf{Y} ) = det(z \mathbf{I} - \mathbf{A})\)
+so algebraic multiplicities remain the same</p>
+  </li>
+  <li>
+    <p>If $\mathbf{x} \in \mathbf{E}_\lambda$ for $\mathbf{A}$, then $\mathbf{Y}^{-1} \mathbf{x}$ is in eigenspace of $\mathbf{Y}^{-1}\mathbf{A} \mathbf{Y}$ corresponding
+to $\lambda$, and vice versa, so geometric multiplicities remain the same
+\end{enumerate}</p>
+  </li>
+</ol>
+
+<h2 id="algebraic-multiplicity--geometric-multiplicity">Algebraic Multiplicity ≥ Geometric Multiplicity</h2>
+
+<ul>
+  <li>Let $n$ be be geometric multiplicity of $\lambda$ for $\mathbf{A}$. Let $\hat{\mathbf{V}} \in \mathbb{C}^{m \times n}$</li>
+</ul>
+
+<p>constitute of orthonormal basis of the $\mathbf{E}_{\lambda}$</p>
+<ul>
+  <li>Extend $\hat{\mathbf{V}}$ to unitary $\mathbf{V} = [ \hat{\mathbf{V}} , \tilde{\mathbf{V}} ] \in \mathbb{C}^{m \times m}$ and form</li>
+</ul>
+
+<p>\(\mathbf{B} = \mathbf{V}^* \mathbf{A} \mathbf{V} = \begin{bmatrix}
+\hat{\mathbf{V}}^* \mathbf{A} \hat{\mathbf{V}}		&amp; \hat{\mathbf{V}}^* \mathbf{A} \tilde{\mathbf{V}}\\
+\tilde{\mathbf{V}}^* \mathbf{A} \hat{\mathbf{V}}	&amp;\tilde{\mathbf{V}}^* \mathbf{A} \tilde{\mathbf{V}}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\lambda \mathbf{I} 	&amp;\mathbf{C} \\
+0							&amp; \mathbf{D}
+\end{bmatrix}\)
+<br /></p>
+<ul>
+  <li>
+    <p>det($z \mathbf{I} - \mathbf{B}$) = det($z \mathbf{I} - \lambda \mathbf{I}$ )det($z \mathbf{I} - \lambda \mathbf{D}$) = $(z - \lambda)^n$ det$(z \mathbf{I} - \lambda \mathbf{D})$, so
+the algebraic multiplicity of $\lambda$ as an eigenvalue of $\mathbf{B}$ is $\ge n$</p>
+  </li>
+  <li>
+    <p>$\mathbf{A}$ and $\mathbf{B}$ are similar, so the algebraic multiplicity of $\lambda$ as an eigenvalue
+of $\mathbf{A}$ is at least $\ge n$</p>
+  </li>
+  <li>
+    <p>Examples:
+\(\mathbf{A} =
+\begin{bmatrix}
+2 &amp; &amp;\\
+&amp;2 &amp; \\
+&amp;	&amp;2
+\end{bmatrix}
+, \mathbf{B} =  
+\begin{bmatrix}
+2 &amp;1 &amp;\\
+&amp;2 &amp;1 \\
+&amp;	&amp;2
+\end{bmatrix}\)
+Their characteristic polynomial is $(z - 2)^3$ , so algebraic multiplicity of
+$\lambda = 2$ is $3$. But geometric multiplicity of $\mathbf{A}$ is $3$ and that of $\mathbf{B}$ is 1.</p>
+  </li>
+</ul>
+
+<h2 id="defective-and-diagonalizable-matrices">Defective and Diagonalizable Matrices</h2>
+
+<p>item An eigenvalue of a matrix is defective if its algebraic multiplicity $&gt;$ its
+geometric multiplicity</p>
+<ul>
+  <li>A matrix is defective if it has a defective eigenvalue. Otherwise, it is
+called nondefective.</li>
+</ul>
+
+<p>An $m \times m$ matrix $\mathbf{A}$ is nondefective iff it has an eigenvalue decomposition
+$\mathbf{A} = \mathbf{X} \Lambda \mathbf{X}^{-1}$.</p>
+
+<ul>
+  <li>
+    <p>($\Leftarrow$) $\Lambda$ is nondefective, and $\mathbf{A}$ is similar to $\Lambda$, so $\mathbf{A}$ is nondefective.</p>
+  </li>
+  <li>
+    <p>($\Rightarrow$) A nondefective matrix has m linearly independent eigenvectors.
+Take them as columns of $\mathbf{X}$ to obtain $\mathbf{A} = \mathbf{X} \Lambda \mathbf{X}^{-1}$.</p>
+  </li>
+  <li>
+    <p>Nondefective matrices are therefore also said to be diagonalizable.</p>
+  </li>
+</ul>
+
+<h2 id="determinant-and-trace">Determinant and Trace</h2>
+
+<ul>
+  <li>Determinant of $\mathbf{A}$ is det($\mathbf{A}$) = $\Pi_ {j=1}^m \lambda_j$, because</li>
+</ul>
+
+\[det(\mathbf{A}) = (-1)^m det(- \mathbf{A}) = (-1)^m p_{\mathbf{A}} (0) = \Pi_{j=1}^m \lambda_j\]
+
+<ul>
+  <li>Trace of $\mathbf{A}$ is tr($\mathbf{A}$) = $\sum^m_{j=1} \lambda_j$, since</li>
+</ul>
+
+<p>\(p_\mathbf{A} (z) = det( z \mathbf{I} - \mathbf{A} ) = z^m - \sum_{j=1}^m a_{jj} z^{m-1} + O(z^{m-2})\)
+\(p_\mathbf{A} (z) = \Pi_{j=1}^m( z - \lambda_j ) = z^m - \sum_{j=1}^m \lambda_{j} z^{m-1} + O(z^{m-2})\)</p>
+
+<ul>
+  <li>Question: Are these results valid for defective or nondefective
+matrices?</li>
+</ul>
+:ET

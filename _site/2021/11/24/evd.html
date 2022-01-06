@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>EigenValue Decomposition | NLA blog</title>
+<meta name="generator" content="Jekyll v4.2.1" />
+<meta property="og:title" content="EigenValue Decomposition" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Eigenvalue and Eigenvectors" />
+<meta property="og:description" content="Eigenvalue and Eigenvectors" />
+<link rel="canonical" href="http://localhost:4000/numerical-linear-algebra/2021/11/24/evd.html" />
+<meta property="og:url" content="http://localhost:4000/numerical-linear-algebra/2021/11/24/evd.html" />
+<meta property="og:site_name" content="NLA blog" />
+<meta property="og:image" content="http://localhost:4000/numerical-linear-algebra/images/SVD-img1.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-11-24T00:00:00+04:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="http://localhost:4000/numerical-linear-algebra/images/SVD-img1.png" />
+<meta property="twitter:title" content="EigenValue Decomposition" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/numerical-linear-algebra/2021/11/24/evd.html","image":"http://localhost:4000/numerical-linear-algebra/images/SVD-img1.png","headline":"EigenValue Decomposition","dateModified":"2021-11-24T00:00:00+04:00","datePublished":"2021-11-24T00:00:00+04:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/numerical-linear-algebra/2021/11/24/evd.html"},"description":"Eigenvalue and Eigenvectors","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/numerical-linear-algebra/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/numerical-linear-algebra/feed.xml" title="NLA blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/numerical-linear-algebra/">NLA blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/numerical-linear-algebra/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">EigenValue Decomposition</h1>
+    <p class="post-meta"><time class="dt-published" datetime="2021-11-24T00:00:00+04:00" itemprop="datePublished">
+        Nov 24, 2021
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h2"><a href="#eigenvalue-and-eigenvectors">Eigenvalue and Eigenvectors</a></li>
+<li class="toc-entry toc-h2"><a href="#eigenvalue-decomposition">Eigenvalue Decomposition</a></li>
+<li class="toc-entry toc-h2"><a href="#geometric-multiplicity">Geometric Multiplicity</a></li>
+<li class="toc-entry toc-h2"><a href="#algebraic-multiplicity">Algebraic Multiplicity</a></li>
+<li class="toc-entry toc-h2"><a href="#similarity-transformations">Similarity Transformations</a></li>
+<li class="toc-entry toc-h2"><a href="#algebraic-multiplicity--geometric-multiplicity">Algebraic Multiplicity ≥ Geometric Multiplicity</a></li>
+<li class="toc-entry toc-h2"><a href="#defective-and-diagonalizable-matrices">Defective and Diagonalizable Matrices</a></li>
+<li class="toc-entry toc-h2"><a href="#determinant-and-trace">Determinant and Trace</a></li>
+</ul><h2 id="eigenvalue-and-eigenvectors">
+<a class="anchor" href="#eigenvalue-and-eigenvectors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Eigenvalue and Eigenvectors</h2>
+
+<ul>
+  <li>Eigenvalue problem of $m \times m$ matrix $\mathbf{A}$ is</li>
+</ul>
+
+\[\mathbf{A} \mathbf{x} = \lambda \mathbf{x}\]
+
+<p>with eigenvalues $\lambda$ and eigenvectors $\mathbf{x}$ (nonzero)</p>
+
+<ul>
+  <li>
+    <p>The set of all the eigenvalues of $\mathbf{A}$ is the spectrum of $\mathbf{A}$</p>
+  </li>
+  <li>
+    <p>Eigenvalue are generally used where a matrix is to be compounded iteratively</p>
+  </li>
+  <li>
+    <p>Eigenvalues are useful for algorithmic and physical reasons</p>
+    <ul>
+      <li>Algorithmically, eigenvalue analysis can reduce a coupled system to a
+collection of scalar problems</li>
+      <li>Physically, eigenvalue analysis can be used to study resonance of
+musical instruments and stability of physical systems</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="eigenvalue-decomposition">
+<a class="anchor" href="#eigenvalue-decomposition" aria-hidden="true"><span class="octicon octicon-link"></span></a>Eigenvalue Decomposition</h2>
+<ul>
+  <li>Eigenvalue decomposition of $\mathbf{A}$ is</li>
+</ul>
+
+\[\mathbf{A} = \mathbf{X} \Lambda \mathbf{X} ^{-1} \quad \text{or} \quad \mathbf{A} \mathbf{X} = \mathbf{X} \Lambda\]
+
+<p>with eigenvectors $\mathbf{x}$ i as columns of $\mathbf{X}$ and eigenvalues $\lambda_i$ along
+diagonal of $\Lambda$. Alternatively,</p>
+
+\[\mathbf{A} \mathbf{x}_i = \lambda_i \mathbf{x}_i\]
+
+<ul>
+  <li>Eigenvalue decomposition is change of basis to “eigenvector
+coordinates”</li>
+</ul>
+
+\[\mathbf{A} \mathbf{x}  = \mathbf{b}  \rightarrow (\mathbf{X} \mathbf{b}^{-1}) =  \Lambda (\mathbf{X}^{-1} \mathbf{x})\]
+
+<ul>
+  <li>
+    <p>Note that eigenvalue decomposition may not exist</p>
+  </li>
+  <li>
+    <p>Question: How does eigenvalue decomposition differ from SVD?</p>
+  </li>
+</ul>
+
+<h2 id="geometric-multiplicity">
+<a class="anchor" href="#geometric-multiplicity" aria-hidden="true"><span class="octicon octicon-link"></span></a>Geometric Multiplicity</h2>
+
+<ul>
+  <li>
+    <p>Eigenvectors corresponding to a single eigenvalue $\lambda$ form an eigenspace $E_\lambda \subseteq  \mathbb{C}^{m \times m}$</p>
+  </li>
+  <li>
+    <p>Eigenspace is invariant in that $\mathbf{A} E_\lambda \subseteq  E_\lambda$</p>
+  </li>
+  <li>
+    <p>Dimension of $E_\lambda $ is the maximum number of linearly independent eigenvectors that can be found</p>
+  </li>
+  <li>
+    <p>Geometric multiplicity of $\lambda$ is dimension of $E_\lambda$ , i.e., dim(null($\mathbf{A} - \lambda \mathbf{I}$ ))</p>
+  </li>
+</ul>
+
+<h2 id="algebraic-multiplicity">
+<a class="anchor" href="#algebraic-multiplicity" aria-hidden="true"><span class="octicon octicon-link"></span></a>Algebraic Multiplicity</h2>
+<ul>
+  <li>The characteristic polynomial of A is degree m polynomial</li>
+</ul>
+
+\[p_\mathbf{A} (z) = det(z \mathbf{I} - \mathbf{A} )  = (z -\lambda_1 )(z -\lambda_2 ) \cdots (z - \lambda_m )\]
+
+<p>which is monic in that coefficient of $z^m$ is $1$</p>
+
+<ul>
+  <li>
+    <p>$\lambda$ is eigenvalue of $\mathbf{A}$ iff $p_\mathbf{A} (\lambda) = 0$</p>
+
+    <ul>
+      <li>If $\lambda$ is eigenvalue, then by definition, $\lambda \mathbf{x} - \mathbf{A} \mathbf{x} = (\lambda \mathbf{I} - \mathbf{A}) \mathbf{x} = 0$, so
+$(\lambda \mathbf{I} - \mathbf{A})$ is singular and its determinant is $0$</li>
+    </ul>
+  </li>
+  <li>
+    <p>Algebraic multiplicity of $\lambda$ is its multiplicity as a root of
+$p_\mathbf{A}$</p>
+  </li>
+  <li>
+    <p>Any matrix $\mathbf{A}$ has $m$ eigenvalues, counted with algebraic multiplicity</p>
+  </li>
+  <li>
+    <p>Question: What are the eigenvalues of a triangular matrix?</p>
+  </li>
+  <li>
+    <p>Question: How are geometric multiplicity and algebraic multiplicity
+related?</p>
+  </li>
+</ul>
+
+<h2 id="similarity-transformations">
+<a class="anchor" href="#similarity-transformations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Similarity Transformations</h2>
+
+<ul>
+  <li>
+    <p>The map $\mathbf{A} \rightarrow \mathbf{Y}^{-1} \mathbf{A} \mathbf{Y}$ is a similarity transformation of $\mathbf{A}$ for any nonsingular $\mathbf{Y} \in \mathbb{C}^{m \times m}$</p>
+  </li>
+  <li>
+    <p>$\mathbf{A}$ and $\mathbf{B}$ are similar if there is similarity transformation $\mathbf{B} = \mathbf{Y}^{-1} \mathbf{A} \mathbf{Y}$</p>
+  </li>
+</ul>
+
+<p>If $\mathbf{Y}$ is nonsingular, then $\mathbf{A}$ and $\mathbf{Y}^{-1} \mathbf{A} \mathbf{Y}$ have the same characteristic
+polynomials, eigenvalues, and algebraic and geometric multiplicities.</p>
+
+<ol>
+  <li>
+    <p>For characteristic polynomial:
+\(det(z \mathbf{I} - \mathbf{Y}^{-1} \mathbf{A} \mathbf{Y}) = det(\mathbf{Y}^{-1} (z \mathbf{I} - \mathbf{A}) \mathbf{Y} ) = det(z \mathbf{I} - \mathbf{A})\)
+so algebraic multiplicities remain the same</p>
+  </li>
+  <li>
+    <p>If $\mathbf{x} \in \mathbf{E}_\lambda$ for $\mathbf{A}$, then $\mathbf{Y}^{-1} \mathbf{x}$ is in eigenspace of $\mathbf{Y}^{-1}\mathbf{A} \mathbf{Y}$ corresponding
+to $\lambda$, and vice versa, so geometric multiplicities remain the same
+\end{enumerate}</p>
+  </li>
+</ol>
+
+<h2 id="algebraic-multiplicity--geometric-multiplicity">
+<a class="anchor" href="#algebraic-multiplicity--geometric-multiplicity" aria-hidden="true"><span class="octicon octicon-link"></span></a>Algebraic Multiplicity ≥ Geometric Multiplicity</h2>
+
+<ul>
+  <li>Let $n$ be be geometric multiplicity of $\lambda$ for $\mathbf{A}$. Let $\hat{\mathbf{V}} \in \mathbb{C}^{m \times n}$</li>
+</ul>
+
+<p>constitute of orthonormal basis of the $\mathbf{E}_{\lambda}$</p>
+<ul>
+  <li>Extend $\hat{\mathbf{V}}$ to unitary $\mathbf{V} = [ \hat{\mathbf{V}} , \tilde{\mathbf{V}} ] \in \mathbb{C}^{m \times m}$ and form</li>
+</ul>
+
+<p>\(\mathbf{B} = \mathbf{V}^* \mathbf{A} \mathbf{V} = \begin{bmatrix}
+\hat{\mathbf{V}}^* \mathbf{A} \hat{\mathbf{V}}		&amp; \hat{\mathbf{V}}^* \mathbf{A} \tilde{\mathbf{V}}\\
+\tilde{\mathbf{V}}^* \mathbf{A} \hat{\mathbf{V}}	&amp;\tilde{\mathbf{V}}^* \mathbf{A} \tilde{\mathbf{V}}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\lambda \mathbf{I} 	&amp;\mathbf{C} \\
+0							&amp; \mathbf{D}
+\end{bmatrix}\)
+<br></p>
+<ul>
+  <li>
+    <p>det($z \mathbf{I} - \mathbf{B}$) = det($z \mathbf{I} - \lambda \mathbf{I}$ )det($z \mathbf{I} - \lambda \mathbf{D}$) = $(z - \lambda)^n$ det$(z \mathbf{I} - \lambda \mathbf{D})$, so
+the algebraic multiplicity of $\lambda$ as an eigenvalue of $\mathbf{B}$ is $\ge n$</p>
+  </li>
+  <li>
+    <p>$\mathbf{A}$ and $\mathbf{B}$ are similar, so the algebraic multiplicity of $\lambda$ as an eigenvalue
+of $\mathbf{A}$ is at least $\ge n$</p>
+  </li>
+  <li>
+    <p>Examples:
+\(\mathbf{A} =
+\begin{bmatrix}
+2 &amp; &amp;\\
+&amp;2 &amp; \\
+&amp;	&amp;2
+\end{bmatrix}
+, \mathbf{B} =  
+\begin{bmatrix}
+2 &amp;1 &amp;\\
+&amp;2 &amp;1 \\
+&amp;	&amp;2
+\end{bmatrix}\)
+Their characteristic polynomial is $(z - 2)^3$ , so algebraic multiplicity of
+$\lambda = 2$ is $3$. But geometric multiplicity of $\mathbf{A}$ is $3$ and that of $\mathbf{B}$ is 1.</p>
+  </li>
+</ul>
+
+<h2 id="defective-and-diagonalizable-matrices">
+<a class="anchor" href="#defective-and-diagonalizable-matrices" aria-hidden="true"><span class="octicon octicon-link"></span></a>Defective and Diagonalizable Matrices</h2>
+
+<p>item An eigenvalue of a matrix is defective if its algebraic multiplicity $&gt;$ its
+geometric multiplicity</p>
+<ul>
+  <li>A matrix is defective if it has a defective eigenvalue. Otherwise, it is
+called nondefective.</li>
+</ul>
+
+<p>An $m \times m$ matrix $\mathbf{A}$ is nondefective iff it has an eigenvalue decomposition
+$\mathbf{A} = \mathbf{X} \Lambda \mathbf{X}^{-1}$.</p>
+
+<ul>
+  <li>
+    <p>($\Leftarrow$) $\Lambda$ is nondefective, and $\mathbf{A}$ is similar to $\Lambda$, so $\mathbf{A}$ is nondefective.</p>
+  </li>
+  <li>
+    <p>($\Rightarrow$) A nondefective matrix has m linearly independent eigenvectors.
+Take them as columns of $\mathbf{X}$ to obtain $\mathbf{A} = \mathbf{X} \Lambda \mathbf{X}^{-1}$.</p>
+  </li>
+  <li>
+    <p>Nondefective matrices are therefore also said to be diagonalizable.</p>
+  </li>
+</ul>
+
+<h2 id="determinant-and-trace">
+<a class="anchor" href="#determinant-and-trace" aria-hidden="true"><span class="octicon octicon-link"></span></a>Determinant and Trace</h2>
+
+<ul>
+  <li>Determinant of $\mathbf{A}$ is det($\mathbf{A}$) = $\Pi_ {j=1}^m \lambda_j$, because</li>
+</ul>
+
+\[det(\mathbf{A}) = (-1)^m det(- \mathbf{A}) = (-1)^m p_{\mathbf{A}} (0) = \Pi_{j=1}^m \lambda_j\]
+
+<ul>
+  <li>Trace of $\mathbf{A}$ is tr($\mathbf{A}$) = $\sum^m_{j=1} \lambda_j$, since</li>
+</ul>
+
+<p>\(p_\mathbf{A} (z) = det( z \mathbf{I} - \mathbf{A} ) = z^m - \sum_{j=1}^m a_{jj} z^{m-1} + O(z^{m-2})\)
+\(p_\mathbf{A} (z) = \Pi_{j=1}^m( z - \lambda_j ) = z^m - \sum_{j=1}^m \lambda_{j} z^{m-1} + O(z^{m-2})\)</p>
+
+<ul>
+  <li>Question: Are these results valid for defective or nondefective
+matrices?</li>
+</ul>
+
+  </div><a class="u-url" href="/numerical-linear-algebra/2021/11/24/evd.html" hidden></a>
+
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/numerical-linear-algebra/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">NLA blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">NLA blog</li><li><a class="u-email" href="mailto:your-email@example.com">your-email@example.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/jekyll"><svg class="svg-icon"><use xlink:href="/numerical-linear-algebra/assets/minima-social-icons.svg#github"></use></svg> <span class="username">jekyll</span></a></li><li><a href="https://www.twitter.com/jekyllrb"><svg class="svg-icon"><use xlink:href="/numerical-linear-algebra/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">jekyllrb</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      extensions: ["tex2jax.js"],
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+        processEscapes: true
+      },
+      "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+
+
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
